@@ -1,24 +1,41 @@
+// ========================================================================
+// KONTEN UNTUK: server.js (VERSI FINAL DENGAN PERBAIKAN HOST & HEALTH CHECK)
+// ========================================================================
 const express = require("express");
 const midtransClient = require("midtrans-client");
 const cors = require("cors");
-require("dotenv").config();
+
+// --- PERBAIKAN PENTING ---
+// Hanya jalankan dotenv di lingkungan non-produksi (lokal)
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000; // Railway akan menyediakan PORT
 const host = "0.0.0.0"; // Ini memberitahu server untuk mendengarkan di semua antarmuka
 
 app.use(cors());
 app.use(express.json());
 
-// Endpoint untuk Health Check dari Railway
+// --- PERBAIKAN PENTING ---
+// Endpoint untuk Health Check dari Railway agar server tidak dimatikan
 app.get("/", (req, res) => {
+  console.log("Health check endpoint '/' diakses, server merespons OK.");
   res.status(200).send("Server PAM Backend is active and running.");
 });
-// -----------------------------------------
 
 const isProduction = process.env.NODE_ENV === "production";
 const serverKey = process.env.MIDTRANS_SERVER_KEY;
 const clientKey = process.env.MIDTRANS_CLIENT_KEY;
+
+// Validasi bahwa kunci ada di lingkungan produksi
+if (isProduction && (!serverKey || !clientKey)) {
+  console.error(
+    "FATAL ERROR: MIDTRANS_SERVER_KEY atau MIDTRANS_CLIENT_KEY tidak ditemukan di environment variables."
+  );
+  process.exit(1); // Hentikan server jika kunci tidak ada
+}
 
 console.log(
   `Menjalankan server dalam mode: ${isProduction ? "Produksi" : "Sandbox"}`
