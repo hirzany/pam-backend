@@ -1,24 +1,24 @@
 // ========================================================================
-// KONTEN UNTUK: server.js (VERSI FINAL DENGAN PERBAIKAN HOST & HEALTH CHECK)
+// KONTEN FINAL UNTUK: server.js
+// Versi ini sudah berisi health check dan konfigurasi yang andal untuk
+// platform hosting seperti Railway atau Render.
 // ========================================================================
 const express = require("express");
 const midtransClient = require("midtrans-client");
 const cors = require("cors");
 
-// --- PERBAIKAN PENTING ---
 // Hanya jalankan dotenv di lingkungan non-produksi (lokal)
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 
 const app = express();
-const port = process.env.PORT || 3000; // Railway/Render akan menyediakan PORT
-const host = "0.0.0.0"; // Ini memberitahu server untuk mendengarkan di semua antarmuka
+const port = process.env.PORT || 3000; // Platform hosting akan menyediakan PORT
+const host = "0.0.0.0"; // Memberitahu server untuk mendengarkan di semua antarmuka
 
 app.use(cors());
 app.use(express.json());
 
-// --- PERBAIKAN PENTING ---
 // Endpoint untuk Health Check dari platform hosting agar server tidak dimatikan
 app.get("/", (req, res) => {
   console.log("Health check endpoint '/' diakses, server merespons OK.");
@@ -47,7 +47,7 @@ let snap = new midtransClient.Snap({
   clientKey: clientKey,
 });
 
-// Endpoint untuk membuat transaksi (tidak berubah)
+// Endpoint untuk membuat transaksi
 app.post("/create-transaction", (req, res) => {
   const { billId, amount, customerName, customerEmail } = req.body;
   const orderId = `PAM-${billId}-${Date.now()}`;
@@ -76,15 +76,18 @@ app.post("/create-transaction", (req, res) => {
     });
 });
 
-// Endpoint untuk menerima notifikasi (tidak berubah)
+// Endpoint untuk menerima notifikasi dari Midtrans
 app.post("/notification-handler", (req, res) => {
   console.log("✅ NOTIFIKASI DARI MIDTRANS DITERIMA!");
   console.log(JSON.stringify(req.body, null, 2));
-  // Logika verifikasi dan update database akan ada di sini
+
+  // Di aplikasi nyata, di sinilah Anda akan memvalidasi signature key
+  // dan memperbarui database pusat Anda.
+
   res.status(200).send("OK");
 });
 
-// Kita menambahkan 'host' agar server bisa diakses oleh Railway/Render
+// Menjalankan server
 app.listen(port, host, () => {
   console.log(`Server pembayaran berjalan di http://${host}:${port}`);
 });
