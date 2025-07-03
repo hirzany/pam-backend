@@ -10,6 +10,12 @@ const host = "0.0.0.0"; // Ini memberitahu server untuk mendengarkan di semua an
 app.use(cors());
 app.use(express.json());
 
+// Endpoint untuk Health Check dari Railway
+app.get("/", (req, res) => {
+  res.status(200).send("Server PAM Backend is active and running.");
+});
+// -----------------------------------------
+
 const isProduction = process.env.NODE_ENV === "production";
 const serverKey = process.env.MIDTRANS_SERVER_KEY;
 const clientKey = process.env.MIDTRANS_CLIENT_KEY;
