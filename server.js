@@ -12,14 +12,14 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const app = express();
-const port = process.env.PORT || 3000; // Railway akan menyediakan PORT
+const port = process.env.PORT || 3000; // Railway/Render akan menyediakan PORT
 const host = "0.0.0.0"; // Ini memberitahu server untuk mendengarkan di semua antarmuka
 
 app.use(cors());
 app.use(express.json());
 
 // --- PERBAIKAN PENTING ---
-// Endpoint untuk Health Check dari Railway agar server tidak dimatikan
+// Endpoint untuk Health Check dari platform hosting agar server tidak dimatikan
 app.get("/", (req, res) => {
   console.log("Health check endpoint '/' diakses, server merespons OK.");
   res.status(200).send("Server PAM Backend is active and running.");
@@ -84,7 +84,7 @@ app.post("/notification-handler", (req, res) => {
   res.status(200).send("OK");
 });
 
-// Kita menambahkan 'host' agar server bisa diakses oleh Railway
+// Kita menambahkan 'host' agar server bisa diakses oleh Railway/Render
 app.listen(port, host, () => {
   console.log(`Server pembayaran berjalan di http://${host}:${port}`);
 });
