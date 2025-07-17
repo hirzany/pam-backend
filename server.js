@@ -7,7 +7,7 @@ const cors = require("cors");
 const admin = require("firebase-admin");
 
 // Hanya jalankan dotenv di lingkungan non-produksi (lokal)
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== "sandbox") {
   require("dotenv").config();
 }
 
@@ -39,7 +39,7 @@ app.get("/", (req, res) => {
   res.status(200).send("Server PAM Backend is active and running.");
 });
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === "sandbox";
 const serverKey = process.env.MIDTRANS_SERVER_KEY;
 const clientKey = process.env.MIDTRANS_CLIENT_KEY;
 
