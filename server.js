@@ -1,5 +1,5 @@
 // ========================================================================
-// KONTEN FINAL UNTUK: pam-backend/server.js
+// KONTEN FINAL UNTUK: pam-backend/server.js (DENGAN PERBAIKAN LOGIKA)
 // ========================================================================
 const express = require("express");
 const midtransClient = require("midtrans-client");
@@ -7,7 +7,10 @@ const cors = require("cors");
 const admin = require("firebase-admin");
 
 // Hanya jalankan dotenv di lingkungan non-produksi (lokal)
-if (process.env.NODE_ENV !== "sandbox") {
+if (
+  process.env.NODE_ENV !== "production" &&
+  process.env.NODE_ENV !== "sandbox"
+) {
   require("dotenv").config();
 }
 
@@ -39,12 +42,19 @@ app.get("/", (req, res) => {
   res.status(200).send("Server PAM Backend is active and running.");
 });
 
-const isProduction = process.env.NODE_ENV === "sandbox";
+// --- PERBAIKAN LOGIKA UTAMA ---
+// isProduction sekarang akan bernilai 'true' HANYA JIKA NODE_ENV adalah 'production'.
+// Jika NODE_ENV adalah 'sandbox' atau lainnya, isProduction akan 'false'.
+const isProduction = process.env.NODE_ENV === "production";
+console.log(`Server berjalan dalam mode produksi: ${isProduction}`);
+
 const serverKey = process.env.MIDTRANS_SERVER_KEY;
 const clientKey = process.env.MIDTRANS_CLIENT_KEY;
 
-if (isProduction && (!serverKey || !clientKey)) {
-  console.error("FATAL ERROR: Kunci Midtrans tidak ditemukan.");
+if (!serverKey || !clientKey) {
+  console.error(
+    "FATAL ERROR: Kunci Midtrans tidak ditemukan di environment variables."
+  );
   process.exit(1);
 }
 
